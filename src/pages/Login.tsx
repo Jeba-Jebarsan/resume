@@ -37,12 +37,26 @@ const Login = () => {
             },
           }}
           providers={[]}
-          onError={(error) => {
-            toast({
-              title: "Authentication Error",
-              description: error.message,
-              variant: "destructive",
-            });
+          localization={{
+            variables: {
+              sign_in: {
+                email_input_placeholder: "Your email address",
+                password_input_placeholder: "Your password",
+              },
+            },
+            translations: {
+              sign_in: {
+                email_label: "Email address",
+                password_label: "Password",
+              },
+              forms: {
+                error: {
+                  password_required: "Password is required",
+                  email_required: "Email is required",
+                  email_invalid: "Invalid email address",
+                },
+              },
+            },
           }}
           redirectTo={`${window.location.origin}/dashboard`}
         />
