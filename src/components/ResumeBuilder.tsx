@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { generateImprovedContent, initializeGemini } from "@/lib/gemini";
-import { Wand2 } from "lucide-react";
+import { ProfileSection } from "./ProfileSection";
+import { PromptSection } from "./PromptSection";
+import { DesignSelector } from "./DesignSelector";
 
 interface ResumeData {
   fullName: string;
@@ -19,6 +20,7 @@ interface ResumeData {
 
 export function ResumeBuilder() {
   const [apiKeySet, setApiKeySet] = useState(false);
+  const [selectedDesign, setSelectedDesign] = useState("modern");
   const [resumeData, setResumeData] = useState<ResumeData>({
     fullName: "",
     email: "",
@@ -47,6 +49,10 @@ export function ResumeBuilder() {
     }
   };
 
+  const updateResumeData = (field: keyof ResumeData, value: string | string[]) => {
+    setResumeData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const improveContent = async (
     type: "summary" | "experience" | "skills",
     content: string,
@@ -55,19 +61,15 @@ export function ResumeBuilder() {
     try {
       const improved = await generateImprovedContent(content, type);
       if (type === "summary") {
-        setResumeData((prev) => ({ ...prev, summary: improved }));
+        updateResumeData("summary", improved);
       } else if (type === "experience" && typeof index === "number") {
-        setResumeData((prev) => ({
-          ...prev,
-          experience: prev.experience.map((exp, i) =>
-            i === index ? improved : exp
-          ),
-        }));
+        const newExperience = [...resumeData.experience];
+        newExperience[index] = improved;
+        updateResumeData("experience", newExperience);
       } else if (type === "skills" && typeof index === "number") {
-        setResumeData((prev) => ({
-          ...prev,
-          skills: prev.skills.map((skill, i) => (i === index ? improved : skill)),
-        }));
+        const newSkills = [...resumeData.skills];
+        newSkills[index] = improved;
+        updateResumeData("skills", newSkills);
       }
       toast({
         title: "Content Improved",
@@ -90,185 +92,118 @@ export function ResumeBuilder() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-4xl font-bold text-center mb-8">AI Resume Builder</h1>
+    <div className="container mx-auto py-8 px-4 space-y-8">
+      <h1 className="text-4xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+        AI Resume Builder
+      </h1>
 
       {!apiKeySet && (
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 border-2 border-primary/20">
           <h2 className="text-2xl font-semibold mb-4">Set Up AI Features</h2>
           <div className="flex gap-4">
             <Input
               placeholder="Enter your Gemini API Key"
               type="password"
               onChange={(e) => handleApiKeySubmit(e.target.value)}
+              className="flex-1"
             />
           </div>
         </Card>
       )}
 
-      <div className="space-y-8">
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
-          <div className="space-y-4">
-            <Input
-              placeholder="Full Name"
-              value={resumeData.fullName}
-              onChange={(e) =>
-                setResumeData((prev) => ({
-                  ...prev,
-                  fullName: e.target.value,
-                }))
-              }
+      <DesignSelector selectedDesign={selectedDesign} onSelectDesign={setSelectedDesign} />
+
+      <ProfileSection
+        fullName={resumeData.fullName}
+        email={resumeData.email}
+        phone={resumeData.phone}
+        onUpdate={(field, value) => updateResumeData(field as keyof ResumeData, value)}
+      />
+
+      <PromptSection
+        label="Professional Summary"
+        content={resumeData.summary}
+        onContentChange={(value) => updateResumeData("summary", value)}
+        onEnhance={() => improveContent("summary", resumeData.summary)}
+        placeholder="Write your professional summary..."
+        isTextArea
+      />
+
+      <Card className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">Work Experience</h2>
+        <div className="space-y-4">
+          {resumeData.experience.map((exp, index) => (
+            <PromptSection
+              key={index}
+              label={`Experience ${index + 1}`}
+              content={exp}
+              onContentChange={(value) => {
+                const newExperience = [...resumeData.experience];
+                newExperience[index] = value;
+                updateResumeData("experience", newExperience);
+              }}
+              onEnhance={() => improveContent("experience", exp, index)}
+              placeholder="Describe your work experience..."
+              isTextArea
             />
+          ))}
+          <Button
+            onClick={() => addField("experience")}
+            variant="outline"
+            className="w-full"
+          >
+            Add Experience
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">Education</h2>
+        <div className="space-y-4">
+          {resumeData.education.map((edu, index) => (
             <Input
-              placeholder="Email"
-              type="email"
-              value={resumeData.email}
-              onChange={(e) =>
-                setResumeData((prev) => ({ ...prev, email: e.target.value }))
-              }
+              key={index}
+              placeholder="Education details..."
+              value={edu}
+              onChange={(e) => {
+                const newEducation = [...resumeData.education];
+                newEducation[index] = e.target.value;
+                updateResumeData("education", newEducation);
+              }}
             />
-            <Input
-              placeholder="Phone"
-              value={resumeData.phone}
-              onChange={(e) =>
-                setResumeData((prev) => ({ ...prev, phone: e.target.value }))
-              }
+          ))}
+          <Button
+            onClick={() => addField("education")}
+            variant="outline"
+            className="w-full"
+          >
+            Add Education
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+        <div className="space-y-4">
+          {resumeData.skills.map((skill, index) => (
+            <PromptSection
+              key={index}
+              label={`Skill ${index + 1}`}
+              content={skill}
+              onContentChange={(value) => {
+                const newSkills = [...resumeData.skills];
+                newSkills[index] = value;
+                updateResumeData("skills", newSkills);
+              }}
+              onEnhance={() => improveContent("skills", skill, index)}
+              placeholder="Add a skill..."
             />
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Professional Summary</h2>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Textarea
-                placeholder="Write your professional summary..."
-                value={resumeData.summary}
-                onChange={(e) =>
-                  setResumeData((prev) => ({
-                    ...prev,
-                    summary: e.target.value,
-                  }))
-                }
-              />
-              {apiKeySet && (
-                <Button
-                  onClick={() => improveContent("summary", resumeData.summary)}
-                  variant="outline"
-                >
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  Enhance
-                </Button>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Work Experience</h2>
-          <div className="space-y-4">
-            {resumeData.experience.map((exp, index) => (
-              <div key={index} className="flex gap-4">
-                <Textarea
-                  placeholder="Describe your work experience..."
-                  value={exp}
-                  onChange={(e) =>
-                    setResumeData((prev) => ({
-                      ...prev,
-                      experience: prev.experience.map((exp, i) =>
-                        i === index ? e.target.value : exp
-                      ),
-                    }))
-                  }
-                />
-                {apiKeySet && (
-                  <Button
-                    onClick={() => improveContent("experience", exp, index)}
-                    variant="outline"
-                  >
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    Enhance
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              onClick={() => addField("experience")}
-              variant="outline"
-              className="w-full"
-            >
-              Add Experience
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Education</h2>
-          <div className="space-y-4">
-            {resumeData.education.map((edu, index) => (
-              <Input
-                key={index}
-                placeholder="Education details..."
-                value={edu}
-                onChange={(e) =>
-                  setResumeData((prev) => ({
-                    ...prev,
-                    education: prev.education.map((edu, i) =>
-                      i === index ? e.target.value : edu
-                    ),
-                  }))
-                }
-              />
-            ))}
-            <Button
-              onClick={() => addField("education")}
-              variant="outline"
-              className="w-full"
-            >
-              Add Education
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Skills</h2>
-          <div className="space-y-4">
-            {resumeData.skills.map((skill, index) => (
-              <div key={index} className="flex gap-4">
-                <Input
-                  placeholder="Add a skill..."
-                  value={skill}
-                  onChange={(e) =>
-                    setResumeData((prev) => ({
-                      ...prev,
-                      skills: prev.skills.map((skill, i) =>
-                        i === index ? e.target.value : skill
-                      ),
-                    }))
-                  }
-                />
-                {apiKeySet && (
-                  <Button
-                    onClick={() => improveContent("skills", skill, index)}
-                    variant="outline"
-                  >
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    Enhance
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              onClick={() => addField("skills")}
-              variant="outline"
-              className="w-full"
-            >
-              Add Skill
-            </Button>
-          </div>
-        </Card>
-      </div>
+          ))}
+          <Button onClick={() => addField("skills")} variant="outline" className="w-full">
+            Add Skill
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
