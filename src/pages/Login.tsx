@@ -37,7 +37,7 @@ const Login = () => {
             },
           }}
           providers={[]}
-          onAuthError={(error) => {
+          onError={(error) => {
             toast({
               title: "Authentication Error",
               description: error.message,
