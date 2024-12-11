@@ -1,24 +1,26 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-let genAI: GoogleGenerativeAI;
+// Initialize Gemini with the API key
+const genAI = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || "");
 
-export const initializeGemini = (apiKey: string) => {
-  genAI = new GoogleGenerativeAI(apiKey);
+export const initializeGemini = () => {
+  if (!process.env.VITE_GEMINI_API_KEY) {
+    throw new Error("Gemini API key not found");
+  }
+  return genAI;
 };
 
-export const generateImprovedContent = async (
-  content: string,
-  type: "summary" | "experience" | "skills"
-): Promise<string> => {
-  if (!genAI) {
-    throw new Error("Gemini API not initialized");
-  }
-
+export const generateImprovedContent = async (content: string, type: string) => {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-  const prompt = `Improve the following ${type} for a professional resume. Make it more impactful and professional while maintaining truthfulness: "${content}"`;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  return response.text();
+  
+  const prompt = `Improve this ${type} for a professional resume: ${content}`;
+  
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Error generating content:", error);
+    throw error;
+  }
 };

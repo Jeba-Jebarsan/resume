@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { generateImprovedContent, initializeGemini } from "@/lib/gemini";
+import { generateImprovedContent } from "@/lib/gemini";
 import { ProfileSection } from "./ProfileSection";
 import { PromptSection } from "./PromptSection";
 import { DesignSelector } from "./DesignSelector";
@@ -19,7 +18,6 @@ interface ResumeData {
 }
 
 export function ResumeBuilder() {
-  const [apiKeySet, setApiKeySet] = useState(false);
   const [selectedDesign, setSelectedDesign] = useState("modern");
   const [resumeData, setResumeData] = useState<ResumeData>({
     fullName: "",
@@ -31,23 +29,6 @@ export function ResumeBuilder() {
     skills: [""],
   });
   const { toast } = useToast();
-
-  const handleApiKeySubmit = (apiKey: string) => {
-    try {
-      initializeGemini(apiKey);
-      setApiKeySet(true);
-      toast({
-        title: "API Key Set",
-        description: "You can now use AI features to enhance your resume",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to initialize AI features",
-        variant: "destructive",
-      });
-    }
-  };
 
   const updateResumeData = (field: keyof ResumeData, value: string | string[]) => {
     setResumeData((prev) => ({ ...prev, [field]: value }));
@@ -78,7 +59,7 @@ export function ResumeBuilder() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to improve content",
+        description: "Failed to improve content. Please check your API key configuration.",
         variant: "destructive",
       });
     }
@@ -96,20 +77,6 @@ export function ResumeBuilder() {
       <h1 className="text-4xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
         AI Resume Builder
       </h1>
-
-      {!apiKeySet && (
-        <Card className="p-6 mb-8 border-2 border-primary/20">
-          <h2 className="text-2xl font-semibold mb-4">Set Up AI Features</h2>
-          <div className="flex gap-4">
-            <Input
-              placeholder="Enter your Gemini API Key"
-              type="password"
-              onChange={(e) => handleApiKeySubmit(e.target.value)}
-              className="flex-1"
-            />
-          </div>
-        </Card>
-      )}
 
       <DesignSelector selectedDesign={selectedDesign} onSelectDesign={setSelectedDesign} />
 
