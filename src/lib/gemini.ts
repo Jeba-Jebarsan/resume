@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini with the API key
-const genAI = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
 
 export const initializeGemini = () => {
-  if (!process.env.VITE_GEMINI_API_KEY) {
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
     throw new Error("Gemini API key not found");
   }
   return genAI;
