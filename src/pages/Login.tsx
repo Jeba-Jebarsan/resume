@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
   const { session } = useSessionContext();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (session) {
@@ -35,6 +37,14 @@ const Login = () => {
             },
           }}
           providers={[]}
+          onError={(error) => {
+            toast({
+              title: "Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }}
+          redirectTo={`${window.location.origin}/dashboard`}
         />
       </div>
     </div>
