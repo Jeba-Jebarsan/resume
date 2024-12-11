@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -37,9 +37,9 @@ const Login = () => {
             },
           }}
           providers={[]}
-          onError={(error) => {
+          onAuthError={(error) => {
             toast({
-              title: "Error",
+              title: "Authentication Error",
               description: error.message,
               variant: "destructive",
             });
