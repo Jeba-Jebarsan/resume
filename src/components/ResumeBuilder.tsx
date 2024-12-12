@@ -5,6 +5,7 @@ import { generateImprovedContent } from "@/lib/gemini";
 import { Eye } from "lucide-react";
 import { ResumeForm } from "./resume/ResumeForm";
 import { ResumePreview } from "./resume/ResumePreview";
+import { ThemeSelector } from "./ThemeSelector";
 
 interface SkillCategory {
   name: string;
@@ -20,9 +21,11 @@ interface ResumeData {
   education: string[];
   skillCategories: SkillCategory[];
   achievements: string[];
+  profileImage?: string;
 }
 
 export function ResumeBuilder() {
+  const [selectedTheme, setSelectedTheme] = useState("purple");
   const [selectedDesign, setSelectedDesign] = useState("modern");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -86,7 +89,11 @@ export function ResumeBuilder() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {(!isPreviewMode || !resumeData.fullName) && (
-          <div className="lg:order-1">
+          <div className="lg:order-1 space-y-8">
+            <ThemeSelector
+              selectedTheme={selectedTheme}
+              onThemeSelect={setSelectedTheme}
+            />
             <ResumeForm
               data={resumeData}
               selectedDesign={selectedDesign}
@@ -102,6 +109,7 @@ export function ResumeBuilder() {
             <ResumePreview
               {...resumeData}
               design={selectedDesign}
+              theme={selectedTheme}
             />
           </div>
         )}
