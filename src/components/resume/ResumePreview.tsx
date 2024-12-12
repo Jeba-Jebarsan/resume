@@ -14,7 +14,6 @@ interface ResumePreviewProps {
   achievements: string[];
   design: string;
   theme: string;
-  profileImage?: string;
 }
 
 export function ResumePreview({
@@ -28,7 +27,6 @@ export function ResumePreview({
   achievements,
   design,
   theme,
-  profileImage,
 }: ResumePreviewProps) {
   const getThemeColor = () => {
     switch (theme) {
@@ -96,13 +94,6 @@ export function ResumePreview({
     <div className={classes.container}>
       <div className="max-w-4xl mx-auto space-y-6">
         <div className={classes.header}>
-          {profileImage && (
-            <img
-              src={profileImage}
-              alt={fullName}
-              className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-            />
-          )}
           <h1 
             className="text-3xl font-bold"
             style={{ color: themeColor }}
