@@ -49,15 +49,53 @@ export function ResumePreview({
     }
   };
 
-  const getGradientClass = () => {
-    const color = getThemeColor();
-    return `bg-gradient-to-r from-${theme}-50/10 to-white`;
+  const getDesignClasses = () => {
+    switch (design) {
+      case 'classic':
+        return {
+          container: "p-8 min-h-screen bg-white",
+          header: "text-center border-b pb-4 mb-6",
+          section: "mb-6",
+          sectionTitle: "text-xl font-serif border-b mb-3 pb-1",
+        };
+      case 'creative':
+        return {
+          container: `p-8 min-h-screen bg-gradient-to-br from-${theme}-50/20 to-white`,
+          header: "text-left flex items-center gap-6 mb-8",
+          section: "mb-8",
+          sectionTitle: "text-2xl font-bold mb-4",
+        };
+      case 'minimal':
+        return {
+          container: "p-8 min-h-screen bg-white",
+          header: "mb-8",
+          section: "mb-6",
+          sectionTitle: "text-lg font-medium uppercase tracking-wider mb-3",
+        };
+      case 'professional':
+        return {
+          container: "p-8 min-h-screen bg-white",
+          header: "bg-gray-50 p-6 mb-8",
+          section: "mb-8 px-6",
+          sectionTitle: "text-xl font-semibold border-l-4 pl-3 mb-4",
+        };
+      default: // modern
+        return {
+          container: `p-8 min-h-screen bg-gradient-to-r from-${theme}-50/10 to-white`,
+          header: "text-center mb-8",
+          section: "mb-6",
+          sectionTitle: "text-xl font-semibold mb-4",
+        };
+    }
   };
 
+  const classes = getDesignClasses();
+  const themeColor = getThemeColor();
+
   return (
-    <div className={`p-8 min-h-screen ${getGradientClass()}`}>
+    <div className={classes.container}>
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center">
+        <div className={classes.header}>
           {profileImage && (
             <img
               src={profileImage}
@@ -67,7 +105,7 @@ export function ResumePreview({
           )}
           <h1 
             className="text-3xl font-bold"
-            style={{ color: getThemeColor() }}
+            style={{ color: themeColor }}
           >
             {fullName}
           </h1>
@@ -77,10 +115,10 @@ export function ResumePreview({
         </div>
 
         {summary && (
-          <div>
+          <div className={classes.section}>
             <h2 
-              className="text-xl font-semibold mb-2"
-              style={{ color: getThemeColor() }}
+              className={classes.sectionTitle}
+              style={{ color: themeColor }}
             >
               Professional Summary
             </h2>
@@ -89,10 +127,10 @@ export function ResumePreview({
         )}
 
         {experience.length > 0 && (
-          <div>
+          <div className={classes.section}>
             <h2 
-              className="text-xl font-semibold mb-2"
-              style={{ color: getThemeColor() }}
+              className={classes.sectionTitle}
+              style={{ color: themeColor }}
             >
               Professional Experience
             </h2>
@@ -105,10 +143,10 @@ export function ResumePreview({
         )}
 
         {education.length > 0 && (
-          <div>
+          <div className={classes.section}>
             <h2 
-              className="text-xl font-semibold mb-2"
-              style={{ color: getThemeColor() }}
+              className={classes.sectionTitle}
+              style={{ color: themeColor }}
             >
               Education
             </h2>
@@ -121,10 +159,10 @@ export function ResumePreview({
         )}
 
         {skillCategories.length > 0 && (
-          <div>
+          <div className={classes.section}>
             <h2 
-              className="text-xl font-semibold mb-2"
-              style={{ color: getThemeColor() }}
+              className={classes.sectionTitle}
+              style={{ color: themeColor }}
             >
               Skills
             </h2>
@@ -136,8 +174,8 @@ export function ResumePreview({
                     <Badge
                       key={skillIndex}
                       style={{
-                        backgroundColor: `${getThemeColor()}20`,
-                        color: getThemeColor(),
+                        backgroundColor: `${themeColor}20`,
+                        color: themeColor,
                       }}
                     >
                       {skill}
@@ -150,10 +188,10 @@ export function ResumePreview({
         )}
 
         {achievements.length > 0 && (
-          <div>
+          <div className={classes.section}>
             <h2 
-              className="text-xl font-semibold mb-2"
-              style={{ color: getThemeColor() }}
+              className={classes.sectionTitle}
+              style={{ color: themeColor }}
             >
               Key Achievements
             </h2>
