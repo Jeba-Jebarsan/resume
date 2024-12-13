@@ -85,15 +85,17 @@ export function ResumeBuilder() {
       return;
     }
 
+    const resumeDataWithTheme = {
+      theme: selectedTheme,
+      design: selectedDesign,
+      ...resumeData,
+    };
+
     const { error } = await supabase
       .from('resumes')
       .insert({
         name: resumeName,
-        data: {
-          ...resumeData,
-          theme: selectedTheme,
-          design: selectedDesign,
-        },
+        data: JSON.stringify(resumeDataWithTheme), // Convert to string to satisfy Json type
       });
 
     if (error) {
@@ -115,19 +117,22 @@ export function ResumeBuilder() {
   };
 
   const loadResume = async (resume: any) => {
-    const { data } = resume;
+    const resumeData = typeof resume.data === 'string' 
+      ? JSON.parse(resume.data) 
+      : resume.data;
+
     setResumeData({
-      fullName: data.fullName || "",
-      email: data.email || "",
-      phone: data.phone || "",
-      summary: data.summary || "",
-      experience: data.experience || [""],
-      education: data.education || [""],
-      skillCategories: data.skillCategories || [],
-      achievements: data.achievements || [],
+      fullName: resumeData.fullName || "",
+      email: resumeData.email || "",
+      phone: resumeData.phone || "",
+      summary: resumeData.summary || "",
+      experience: resumeData.experience || [""],
+      education: resumeData.education || [""],
+      skillCategories: resumeData.skillCategories || [],
+      achievements: resumeData.achievements || [],
     });
-    setSelectedTheme(data.theme || "purple");
-    setSelectedDesign(data.design || "modern");
+    setSelectedTheme(resumeData.theme || "purple");
+    setSelectedDesign(resumeData.design || "modern");
     setIsLoadDialogOpen(false);
     
     toast({
