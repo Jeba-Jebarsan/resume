@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { generateImprovedContent } from "@/lib/gemini";
-import { Eye } from "lucide-react";
+import { Eye, ArrowLeft } from "lucide-react";
 import { ResumeForm } from "./resume/ResumeForm";
 import { ResumePreview } from "./resume/ResumePreview";
 import { ThemeSelector } from "./ThemeSelector";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SkillCategory {
   name: string;
@@ -21,13 +22,13 @@ interface ResumeData {
   education: string[];
   skillCategories: SkillCategory[];
   achievements: string[];
-  profileImage?: string;
 }
 
 export function ResumeBuilder() {
   const [selectedTheme, setSelectedTheme] = useState("purple");
   const [selectedDesign, setSelectedDesign] = useState("modern");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const isMobile = useIsMobile();
   const [resumeData, setResumeData] = useState<ResumeData>({
     fullName: "",
     email: "",
@@ -72,9 +73,9 @@ export function ResumeBuilder() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+    <div className="container mx-auto py-4 md:py-8 px-4">
+      <div className="flex justify-between items-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
           AI Resume Builder
         </h1>
         <Button
@@ -82,14 +83,15 @@ export function ResumeBuilder() {
           onClick={() => setIsPreviewMode(!isPreviewMode)}
           className="flex items-center gap-2"
         >
-          <Eye className="w-4 h-4" />
-          {isPreviewMode ? "Edit Mode" : "Preview Mode"}
+          {isPreviewMode && isMobile && <ArrowLeft className="w-4 h-4" />}
+          {!isMobile && <Eye className="w-4 h-4" />}
+          {isPreviewMode ? "Edit Mode" : "Preview"}
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {(!isPreviewMode || !resumeData.fullName) && (
-          <div className="lg:order-1 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+        {(!isPreviewMode || !resumeData.fullName || !isMobile) && (
+          <div className="lg:order-1 space-y-4 md:space-y-8">
             <ThemeSelector
               selectedTheme={selectedTheme}
               onThemeSelect={setSelectedTheme}
@@ -104,7 +106,7 @@ export function ResumeBuilder() {
           </div>
         )}
         
-        {(isPreviewMode || resumeData.fullName) && (
+        {(isPreviewMode || resumeData.fullName || !isMobile) && (
           <div className="lg:order-2 sticky top-8">
             <ResumePreview
               {...resumeData}

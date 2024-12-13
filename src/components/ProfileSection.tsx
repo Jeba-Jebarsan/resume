@@ -10,15 +10,15 @@ interface ProfileSectionProps {
 
 export function ProfileSection({ fullName, email, phone, onUpdate }: ProfileSectionProps) {
   return (
-    <Card className="p-6 bg-gradient-to-br from-purple-50 to-white">
-      <div className="flex flex-col space-y-4 w-full">
+    <Card className="p-4 md:p-6 bg-gradient-to-br from-purple-50 to-white">
+      <div className="flex flex-col space-y-3 md:space-y-4 w-full">
         <Input
           placeholder="Full Name"
           value={fullName}
           onChange={(e) => onUpdate("fullName", e.target.value)}
-          className="text-lg font-semibold"
+          className="text-base md:text-lg font-semibold"
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <Input
             placeholder="Email"
             type="email"

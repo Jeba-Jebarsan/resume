@@ -16,9 +16,9 @@ interface ThemeSelectorProps {
 
 export function ThemeSelector({ selectedTheme, onThemeSelect }: ThemeSelectorProps) {
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Select Theme Color</h3>
-      <div className="grid grid-cols-6 gap-3">
+    <Card className="p-4 md:p-6">
+      <h3 className="text-base md:text-lg font-semibold mb-4">Select Theme Color</h3>
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
         {themeColors.map((theme) => (
           <button
             key={theme.id}
