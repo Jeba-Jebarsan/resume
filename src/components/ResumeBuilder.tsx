@@ -7,6 +7,8 @@ import { ThemeSelector } from "./ThemeSelector";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { ResumeHeader } from "./resume/ResumeHeader";
+import { useSessionContext } from "@supabase/auth-helpers-react";
+import { useNavigate } from "react-router-dom";
 
 interface SkillCategory {
   name: string;
@@ -32,6 +34,8 @@ export function ResumeBuilder() {
   const [resumeName, setResumeName] = useState("");
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { session } = useSessionContext();
+  const navigate = useNavigate();
   const [resumeData, setResumeData] = useState<ResumeData>({
     fullName: "",
     email: "",
@@ -45,13 +49,20 @@ export function ResumeBuilder() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!session) {
+      navigate("/login");
+      return;
+    }
     loadResumes();
-  }, []);
+  }, [session, navigate]);
 
   const loadResumes = async () => {
+    if (!session?.user?.id) return;
+
     const { data, error } = await supabase
       .from('resumes')
       .select('*')
+      .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -67,6 +78,15 @@ export function ResumeBuilder() {
   };
 
   const saveResume = async () => {
+    if (!session?.user?.id) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save resumes",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!resumeName.trim()) {
       toast({
         title: "Please enter a resume name",
@@ -86,7 +106,8 @@ export function ResumeBuilder() {
       .from('resumes')
       .insert({
         name: resumeName,
-        data: JSON.stringify(resumeDataWithTheme),
+        data: resumeDataWithTheme,
+        user_id: session.user.id
       });
 
     if (error) {
