@@ -62,7 +62,14 @@ export function useResume() {
       return;
     }
 
-    setResumes(data || []);
+    // Transform the raw data into the correct Resume type
+    const transformedResumes: Resume[] = (data || []).map(item => ({
+      id: item.id,
+      name: item.name,
+      data: typeof item.data === 'string' ? JSON.parse(item.data) : item.data
+    }));
+
+    setResumes(transformedResumes);
   };
 
   const saveResume = async (resumeData: ResumeData, theme: string, design: string) => {
@@ -94,7 +101,7 @@ export function useResume() {
       .from('resumes')
       .insert({
         name: resumeName,
-        data: JSON.stringify(resumeDataWithTheme),
+        data: resumeDataWithTheme,
         user_id: session.user.id
       });
 
