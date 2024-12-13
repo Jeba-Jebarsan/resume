@@ -40,26 +40,26 @@ export function DesignSelector({
   onSelectDesign,
 }: DesignSelectorProps) {
   return (
-    <Card className="p-4">
-      <h2 className="text-lg font-semibold mb-3">Choose Template</h2>
-      <div className="space-y-2">
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Choose Template</h2>
+      <div className="space-y-3">
         {designs.map((design) => (
           <Button
             key={design.id}
             variant={selectedDesign === design.id ? "default" : "outline"}
-            className={`w-full h-auto p-3 flex items-start gap-3 relative text-left ${
-              selectedDesign === design.id ? 'bg-primary text-primary-foreground' : ''
+            className={`w-full h-auto p-4 flex items-start gap-3 relative text-left ${
+              selectedDesign === design.id ? 'bg-[#0A2472] hover:bg-[#0A2472]/90 text-white' : 'hover:bg-slate-50'
             }`}
             onClick={() => onSelectDesign(design.id)}
           >
             <div className="flex-1">
-              <span className="block font-medium text-sm mb-0.5">{design.name}</span>
-              <span className="block text-xs opacity-90">
+              <span className="block font-semibold text-base mb-1">{design.name}</span>
+              <span className="block text-sm opacity-90">
                 {design.description}
               </span>
             </div>
             {selectedDesign === design.id && (
-              <Check className="w-4 h-4 absolute top-3 right-3 shrink-0" />
+              <Check className="w-5 h-5 absolute top-4 right-4 shrink-0" />
             )}
           </Button>
         ))}
