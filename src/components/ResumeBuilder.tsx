@@ -1,41 +1,27 @@
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 import { generateImprovedContent } from "@/lib/gemini";
 import { ResumeForm } from "./resume/ResumeForm";
 import { ResumePreview } from "./resume/ResumePreview";
 import { ThemeSelector } from "./ThemeSelector";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { supabase } from "@/integrations/supabase/client";
 import { ResumeHeader } from "./resume/ResumeHeader";
-import { useSessionContext } from "@supabase/auth-helpers-react";
-import { useNavigate } from "react-router-dom";
-
-interface SkillCategory {
-  name: string;
-  skills: string[];
-}
-
-interface ResumeData {
-  fullName: string;
-  email: string;
-  phone: string;
-  summary: string;
-  experience: string[];
-  education: string[];
-  skillCategories: SkillCategory[];
-  achievements: string[];
-}
+import { useResume, ResumeData } from "@/hooks/use-resume";
+import { useToast } from "@/components/ui/use-toast";
 
 export function ResumeBuilder() {
   const [selectedTheme, setSelectedTheme] = useState("purple");
   const [selectedDesign, setSelectedDesign] = useState("modern");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [resumes, setResumes] = useState<any[]>([]);
-  const [resumeName, setResumeName] = useState("");
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { session } = useSessionContext();
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const {
+    resumes,
+    resumeName,
+    setResumeName,
+    saveResume,
+  } = useResume();
+
   const [resumeData, setResumeData] = useState<ResumeData>({
     fullName: "",
     email: "",
@@ -46,86 +32,9 @@ export function ResumeBuilder() {
     skillCategories: [],
     achievements: [],
   });
-  const { toast } = useToast();
 
-  useEffect(() => {
-    if (!session) {
-      navigate("/login");
-      return;
-    }
-    loadResumes();
-  }, [session, navigate]);
-
-  const loadResumes = async () => {
-    if (!session?.user?.id) return;
-
-    const { data, error } = await supabase
-      .from('resumes')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      toast({
-        title: "Error loading resumes",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setResumes(data || []);
-  };
-
-  const saveResume = async () => {
-    if (!session?.user?.id) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to save resumes",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!resumeName.trim()) {
-      toast({
-        title: "Please enter a resume name",
-        description: "A name is required to save your resume",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const resumeDataWithTheme = {
-      theme: selectedTheme,
-      design: selectedDesign,
-      ...resumeData,
-    };
-
-    const { error } = await supabase
-      .from('resumes')
-      .insert({
-        name: resumeName,
-        data: resumeDataWithTheme,
-        user_id: session.user.id
-      });
-
-    if (error) {
-      toast({
-        title: "Error saving resume",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Resume saved successfully",
-      description: "Your resume has been saved to your account",
-    });
-
-    setResumeName("");
-    loadResumes();
+  const handleSaveResume = () => {
+    saveResume(resumeData, selectedTheme, selectedDesign);
   };
 
   const loadResume = async (resume: any) => {
@@ -189,7 +98,7 @@ export function ResumeBuilder() {
       <ResumeHeader
         resumeName={resumeName}
         onResumeNameChange={setResumeName}
-        onSave={saveResume}
+        onSave={handleSaveResume}
         resumes={resumes}
         isLoadDialogOpen={isLoadDialogOpen}
         onLoadDialogOpenChange={setIsLoadDialogOpen}
