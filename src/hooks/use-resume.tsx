@@ -101,7 +101,7 @@ export function useResume() {
       .from('resumes')
       .insert({
         name: resumeName,
-        data: resumeDataWithTheme,
+        data: JSON.stringify(resumeDataWithTheme),
         user_id: session.user.id
       });
 

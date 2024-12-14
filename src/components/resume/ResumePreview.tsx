@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { ResumeCover } from "./ResumeCover";
 
 interface ResumePreviewProps {
   fullName: string;
@@ -91,108 +92,95 @@ export function ResumePreview({
   const themeColor = getThemeColor();
 
   return (
-    <div className={classes.container}>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className={classes.header}>
-          <h1 
-            className="text-3xl font-bold"
-            style={{ color: themeColor }}
-          >
-            {fullName}
-          </h1>
-          <div className="text-gray-600 mt-2">
-            {email} • {phone}
-          </div>
-        </div>
+    <div className="space-y-8">
+      <ResumeCover
+        fullName={fullName}
+        email={email}
+        phone={phone}
+        summary={summary}
+        theme={theme}
+        design={design}
+      />
 
-        {summary && (
-          <div className={classes.section}>
-            <h2 
-              className={classes.sectionTitle}
-              style={{ color: themeColor }}
-            >
-              Professional Summary
-            </h2>
-            <p className="text-gray-700">{summary}</p>
-          </div>
-        )}
-
-        {experience.length > 0 && (
-          <div className={classes.section}>
-            <h2 
-              className={classes.sectionTitle}
-              style={{ color: themeColor }}
-            >
-              Professional Experience
-            </h2>
-            {experience.map((exp, index) => (
-              <div key={index} className="mb-4">
-                <p className="text-gray-700">{exp}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {education.length > 0 && (
-          <div className={classes.section}>
-            <h2 
-              className={classes.sectionTitle}
-              style={{ color: themeColor }}
-            >
-              Education
-            </h2>
-            {education.map((edu, index) => (
-              <div key={index} className="mb-2">
-                <p className="text-gray-700">{edu}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {skillCategories.length > 0 && (
-          <div className={classes.section}>
-            <h2 
-              className={classes.sectionTitle}
-              style={{ color: themeColor }}
-            >
-              Skills
-            </h2>
-            {skillCategories.map((category, index) => (
-              <div key={index} className="mb-4">
-                <h3 className="font-medium text-gray-800 mb-2">{category.name}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill, skillIndex) => (
-                    <Badge
-                      key={skillIndex}
-                      style={{
-                        backgroundColor: `${themeColor}20`,
-                        color: themeColor,
-                      }}
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
+      <div className={classes.container}>
+        <div className="max-w-4xl mx-auto space-y-6">
+          {experience.length > 0 && (
+            <div className={classes.section}>
+              <h2 
+                className={classes.sectionTitle}
+                style={{ color: themeColor }}
+              >
+                Professional Experience
+              </h2>
+              {experience.map((exp, index) => (
+                <div key={index} className="mb-4">
+                  <p className="text-gray-700">{exp}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {achievements.length > 0 && (
-          <div className={classes.section}>
-            <h2 
-              className={classes.sectionTitle}
-              style={{ color: themeColor }}
-            >
-              Key Achievements
-            </h2>
-            <ul className="list-disc list-inside space-y-2">
-              {achievements.map((achievement, index) => (
-                <li key={index} className="text-gray-700">{achievement}</li>
               ))}
-            </ul>
-          </div>
-        )}
+            </div>
+          )}
+
+          {education.length > 0 && (
+            <div className={classes.section}>
+              <h2 
+                className={classes.sectionTitle}
+                style={{ color: themeColor }}
+              >
+                Education
+              </h2>
+              {education.map((edu, index) => (
+                <div key={index} className="mb-2">
+                  <p className="text-gray-700">{edu}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {skillCategories.length > 0 && (
+            <div className={classes.section}>
+              <h2 
+                className={classes.sectionTitle}
+                style={{ color: themeColor }}
+              >
+                Skills
+              </h2>
+              {skillCategories.map((category, index) => (
+                <div key={index} className="mb-4">
+                  <h3 className="font-medium text-gray-800 mb-2">{category.name}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.map((skill, skillIndex) => (
+                      <Badge
+                        key={skillIndex}
+                        style={{
+                          backgroundColor: `${themeColor}20`,
+                          color: themeColor,
+                        }}
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {achievements.length > 0 && (
+            <div className={classes.section}>
+              <h2 
+                className={classes.sectionTitle}
+                style={{ color: themeColor }}
+              >
+                Key Achievements
+              </h2>
+              <ul className="list-disc list-inside space-y-2">
+                {achievements.map((achievement, index) => (
+                  <li key={index} className="text-gray-700">{achievement}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
