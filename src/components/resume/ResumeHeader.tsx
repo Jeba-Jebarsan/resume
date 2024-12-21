@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Eye, ArrowLeft } from "lucide-react";
-import { SaveResumeDialog } from "./SaveResumeDialog";
-import { LoadResumeDialog } from "./LoadResumeDialog";
+import { Eye, ArrowLeft, LogOut, User, Save, Edit } from "lucide-react";
+import { useSessionContext } from "@supabase/auth-helpers-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
 
 interface ResumeHeaderProps {
   resumeName: string;
@@ -10,10 +12,11 @@ interface ResumeHeaderProps {
   resumes: any[];
   isLoadDialogOpen: boolean;
   onLoadDialogOpenChange: (open: boolean) => void;
-  onLoad: (resume: any) => void;
+  onLoad: (resume: any) => Promise<void>;
   isPreviewMode: boolean;
   onPreviewModeChange: () => void;
   isMobile: boolean;
+  onLogout: () => void;
 }
 
 export function ResumeHeader({
@@ -27,32 +30,62 @@ export function ResumeHeader({
   isPreviewMode,
   onPreviewModeChange,
   isMobile,
+  onLogout,
 }: ResumeHeaderProps) {
+  const { session } = useSessionContext();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
+
   return (
-    <div className="flex justify-between items-center mb-6 md:mb-8">
-      <h1 className="text-2xl md:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-        AI Resume Builder
-      </h1>
-      <div className="flex gap-2">
-        <SaveResumeDialog
-          resumeName={resumeName}
-          onResumeNameChange={onResumeNameChange}
-          onSave={onSave}
-        />
-        <LoadResumeDialog
-          resumes={resumes}
-          isOpen={isLoadDialogOpen}
-          onOpenChange={onLoadDialogOpenChange}
-          onLoad={onLoad}
+    <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex items-center gap-3 flex-1">
+        <Input
+          placeholder="Resume Name"
+          value={resumeName}
+          onChange={(e) => onResumeNameChange(e.target.value)}
+          className="flex-1"
         />
         <Button
           variant="outline"
-          onClick={onPreviewModeChange}
-          className="flex items-center gap-2"
+          onClick={onSave}
+          className="shrink-0"
         >
-          {isPreviewMode && isMobile && <ArrowLeft className="w-4 h-4" />}
-          {!isMobile && <Eye className="w-4 h-4" />}
-          {isPreviewMode ? "Edit Mode" : "Preview"}
+          <Save className="w-4 h-4 mr-2" />
+          Save
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {isMobile && (
+          <Button
+            variant="outline"
+            onClick={onPreviewModeChange}
+            className="flex-1"
+          >
+            {isPreviewMode ? (
+              <>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </>
+            )}
+          </Button>
+        )}
+        <Button variant="outline" className="shrink-0">
+          <User className="w-4 h-4 mr-2" />
+          {session?.user?.email}
+        </Button>
+        <Button variant="outline" className="shrink-0" onClick={onLogout}>
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
         </Button>
       </div>
     </div>

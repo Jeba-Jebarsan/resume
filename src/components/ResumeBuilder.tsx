@@ -94,46 +94,79 @@ export function ResumeBuilder() {
   };
 
   return (
-    <div className="container mx-auto py-4 md:py-8 px-4">
-      <ResumeHeader
-        resumeName={resumeName}
-        onResumeNameChange={setResumeName}
-        onSave={handleSaveResume}
-        resumes={resumes}
-        isLoadDialogOpen={isLoadDialogOpen}
-        onLoadDialogOpenChange={setIsLoadDialogOpen}
-        onLoad={loadResume}
-        isPreviewMode={isPreviewMode}
-        onPreviewModeChange={() => setIsPreviewMode(!isPreviewMode)}
-        isMobile={isMobile}
-      />
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto py-4 px-4 sm:px-6">
+        <ResumeHeader
+          resumeName={resumeName}
+          onResumeNameChange={setResumeName}
+          onSave={handleSaveResume}
+          resumes={resumes}
+          isLoadDialogOpen={isLoadDialogOpen}
+          onLoadDialogOpenChange={setIsLoadDialogOpen}
+          onLoad={loadResume}
+          isPreviewMode={isPreviewMode}
+          onPreviewModeChange={() => setIsPreviewMode(!isPreviewMode)}
+          isMobile={isMobile}
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-        {(!isPreviewMode || !resumeData.fullName || !isMobile) && (
-          <div className="lg:order-1 space-y-4 md:space-y-8">
-            <ThemeSelector
-              selectedTheme={selectedTheme}
-              onThemeSelect={setSelectedTheme}
-            />
-            <ResumeForm
-              data={resumeData}
-              selectedDesign={selectedDesign}
-              onUpdate={updateResumeData}
-              onDesignSelect={setSelectedDesign}
-              onImproveContent={improveContent}
-            />
-          </div>
-        )}
-        
-        {(isPreviewMode || resumeData.fullName || !isMobile) && (
-          <div className="lg:order-2 sticky top-8">
-            <ResumePreview
-              {...resumeData}
-              design={selectedDesign}
-              theme={selectedTheme}
-            />
-          </div>
-        )}
+        <div className="mt-6 lg:mt-8">
+          {isMobile ? (
+            // Mobile View
+            <div className="space-y-6">
+              {isPreviewMode ? (
+                // Preview Mode
+                <div className="bg-white rounded-lg shadow">
+                  <ResumePreview
+                    {...resumeData}
+                    design={selectedDesign}
+                    theme={selectedTheme}
+                  />
+                </div>
+              ) : (
+                // Edit Mode
+                <div className="space-y-6">
+                  <ThemeSelector
+                    selectedTheme={selectedTheme}
+                    onThemeSelect={setSelectedTheme}
+                  />
+                  <ResumeForm
+                    data={resumeData}
+                    selectedDesign={selectedDesign}
+                    onUpdate={updateResumeData}
+                    onDesignSelect={setSelectedDesign}
+                    onImproveContent={improveContent}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            // Desktop View
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <ThemeSelector
+                  selectedTheme={selectedTheme}
+                  onThemeSelect={setSelectedTheme}
+                />
+                <ResumeForm
+                  data={resumeData}
+                  selectedDesign={selectedDesign}
+                  onUpdate={updateResumeData}
+                  onDesignSelect={setSelectedDesign}
+                  onImproveContent={improveContent}
+                />
+              </div>
+              <div className="sticky top-8">
+                <div className="bg-white rounded-lg shadow">
+                  <ResumePreview
+                    {...resumeData}
+                    design={selectedDesign}
+                    theme={selectedTheme}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -23,14 +23,23 @@ export function PromptSection({
 }: PromptSectionProps) {
   const InputComponent = isTextArea ? Textarea : Input;
 
+  const cleanContent = (text: string) => {
+    // Remove all occurrences of "**Original:**", "**Improved:**" and any remaining "**"
+    return text
+      .replace(/\*\*Original:\*\*/g, '')
+      .replace(/\*\*Improved:\*\*/g, '')
+      .replace(/\*\*/g, '')
+      .trim();
+  };
+
   return (
     <Card className="p-6 transition-all hover:shadow-md">
       <h3 className="text-lg font-semibold mb-4">{label}</h3>
       <div className="flex gap-4">
         <InputComponent
           placeholder={placeholder}
-          value={content}
-          onChange={(e) => onContentChange(e.target.value)}
+          value={cleanContent(content)}
+          onChange={(e) => onContentChange(cleanContent(e.target.value))}
           className="flex-1"
         />
         <Button onClick={onEnhance} variant="outline" className="shrink-0">
